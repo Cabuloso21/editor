@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" href="styles/style.css"/>
+  <title>editor em edição</title>
+</head>
+<body>
+  
+  <style>
+    
+  body {
+  margin: 0;
+  }
+    
+  
+ .logo {
+ color: white;
+ background: #333;
+ padding: 5px; 
+ font-size: 25px;
+ font-weight: bold;
+ text-align: center;
+ border-bottom: 1px solid white;
+ } 
+  
+  
+ #buttons {
+  display: flex;
+  
+  background-color: #333; /* Optional background color */
+  padding: 1px;
+  box-sizing: border-box;
+  
+  }
+
+
+
+  
+
+#buttons button {
+    margin-right: 0px; /* Ajuste o espaçamento entre os botões conforme necessário */
+}
+
+  
+  
+  
+  button {
+    margin: 5px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+  }
+
+  input[type="file"] {
+    display: none;
+  }
+
+
+  
+  
+#editorContainer {
+ display: flex;
+ margin-top: 15px;
+ border: none;
+ border: 1px solid none;
+}
+  
+  #lineNumbers {
+    padding: 10px;
+    background-color: white;
+    border-right: 1px solid #ccc;
+    text-align: right;
+} 
+  
+  #editor {
+ width: 96%;
+ height: 1000px;
+ border: none;
+ font-size: 15.60px;
+ 
+ padding: 10px;
+ white-space: nowrap; /* Impede quebras de linha automáticas */
+ overflow-x: auto; /* Adiciona uma barra de rolagem horizontal quando necessário */
+ outline: none;
+    
+}
+    
+ </style>  
+</body>
+</html>
+
+
+<div id="buttons">
+    <button onclick="runCode()">Executar</button>
+    <button onclick="deleteCode()">Excluir</button>
+    <input type="file" id="fileInput" accept=".html,.htm" style="display: none;">
+    <button onclick="openFile()">Abrir Arquivo</button>
+    <button onclick="saveToFile()">Salvar Como</button>
+  </div>
+
+
+
+
+ <div>
+ <div id="editorContainer">
+    
+ <div id="lineNumbers"></div>
+    
+ <textarea id="editor" oninput="updateLineNumbers()" onblur="saveCodeToLocalStorage()"></textarea>
+ </div>
+   
+ 
+  <script>
+    var editor = document.getElementById("editor");
+    var fileInput = document.getElementById("fileInput");
+    var lineNumbers = document.getElementById("lineNumbers");
+
+  
+   // Atualizar números de linha ao carregar código salvo
+    if (localStorage.getItem("savedCode")) {
+      editor.value = localStorage.getItem("savedCode");
+      updateLineNumbers();
+    }
+
+  
+   // Adicionar ouvinte de evento para salvar código antes de descarregar a página
+    window.addEventListener("beforeunload", saveCodeToLocalStorage);
+
+    function runCode() {
+      var code = editor.value;
+      var newWindow = window.open();
+      newWindow.document.write(code);
+      localStorage.setItem("savedCode", code);
+    }
+  
+  
+  
+    function deleteCode() {
+      if (confirm("Tem certeza de que deseja excluir o código?")) {
+        editor.value = "";
+        localStorage.removeItem("savedCode");
+        updateLineNumbers();
+      }
+    }
+
+  
+  
+  
+  
+  
+  function openFile() {
+      fileInput.click();
+    }
+   
+  
+  fileInput.addEventListener("change", function (event) {
+      var file = event.target.files[0];
+      var reader = new FileReader();
+
+      reader.onload = function (e) {
+        var contents = e.target.result;
+        editor.value = contents;
+        updateLineNumbers();
+      };
+
+      reader.readAsText(file);
+    });
+
+  
+  function saveToFile() {
+      var code = editor.value;
+      var blob = new Blob([code], { type: "text/html" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "codigo.html";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+  
+  // ... (seu JavaScript existente) ...
+
+  function updateLineNumbers() {
+    var lines = editor.value.split('\n');
+    var numbers = Array.from({ length: lines.length }, (_, i) => i + 1).join('<br>');
+    lineNumbers.innerHTML = numbers;
+  }
+
+  function saveCodeToLocalStorage() {
+    localStorage.setItem("savedCode", editor.value);
+  }
+
+
+ 
+   
+   
+   
+   
+   
+   
+   function runCode() {
+  var code = editor.value;
+  var newWindow = window.open();
+  newWindow.document.write(code);
+  newWindow.document.close(); // Adicione esta linha para garantir que o documento seja fechado corretamente
+  newWindow.focus(); // Dê foco à nova janela
+  localStorage.setItem("savedCode", code);
+}
+
+   
+   
+   
+   
+   
+   
+   
+   
+   
+  
+   </script>
